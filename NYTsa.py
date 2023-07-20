@@ -6,10 +6,18 @@ import datetime
 import dateutil
 import pandas as pd
 from dateutil.relativedelta import relativedelta
+
 import nltk
-# import opinion_finder
 nltk.download('vader_lexicon')
-from nltk.sentiment import SentimentIntensityAnalyzer
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
+# import opinion_finder
+
+from textblob import TextBlob
+
+
+import torch
+from transformers import BertTokenizer, BertForSequenceClassification
 
 
 #BOTTLENECK: 10 requests per minute, 4000 requests per day
@@ -32,14 +40,14 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 
 
 end = datetime.date(2021, 12, 31) # Dec 31 2020
-start = end - relativedelta(years = 5) # Jan 2016
+start = end - relativedelta(months = 1) # Jan 2016
 
 def send_request(date):
     base_url = 'https://api.nytimes.com/svc/archive/v1/'
     private_key = "ZTDuHtMacPzfve7f7GZ7obg1TTGZ8myp"
     url = base_url + '/' + date[0] + '/' + date[1] + '.json?api-key=' + private_key
     response = requests.get(url).json()
-    time.sleep(7) # 10 requests per minute = 1 request every 6 seconds (7 to be safe)
+    time.sleep(6) # 10 requests per minute = 1 request every 6 seconds (7 to be safe)
     return response
 
 
@@ -52,14 +60,16 @@ def is_valid(article, date):
 def parse_response(response):
     data = {'headline': [],  
         'date': [], 
-        'compound_score': [],
-        'SA': [], # compound, negative, neutral, positive'
+        'vader_SA': [],
+        'textblob_SA' : [],
         'section': [],
         'abstract': [],
         'keywords': [],
         'url': [],
         'doc_type': [],
         'material_type': [],
+        'vader_full': [], # compound, negative, neutral, positive'
+
         }
     try:
         articles = response['response']['docs']
@@ -89,10 +99,22 @@ def parse_response(response):
             # opinion_scores = opinion_finder.get_opinion_scores(str(article['headline']) + ' ' + article['abstract']) # what SA is being performed on
             # data['OpinionFinder'].append(opinion_scores)
 
+            text = str(article['headline']) + ' ' + str(article['abstract'])
+            
             sid = SentimentIntensityAnalyzer()
-            sentiment_score = sid.polarity_scores(str(article['headline']) + ' ' + str(article['abstract']))
-            data['SA'].append(sentiment_score)
-            data['compound_score'].append(sentiment_score['compound'])
+            nltk_sentiment_score = sid.polarity_scores(text)
+            data['vader_full'].append(nltk_sentiment_score)
+            data['vader_SA'].append(nltk_sentiment_score['compound'])
+
+            blob = TextBlob(text)
+            data['textblob_SA'].append(blob.sentiment.polarity)
+
+            # Load the pre-trained tokenizer and model for sentiment analysis
+            tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+            model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
+
+            
+
 
     return pd.DataFrame(data) 
 
