@@ -11,13 +11,24 @@ import nltk
 nltk.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-# import opinion_finder
-
 from textblob import TextBlob
 
+# import textrazor
 
-import torch
-from transformers import BertTokenizer, BertForSequenceClassification
+# from transformers import pipeline
+
+
+# import opinion_finder
+
+# import torch
+# from transformers import BertTokenizer, BertForSequenceClassification
+
+# from flair.models import TextClassifier
+# from flair.data import Sentence
+
+# from polyglot.detect import Detector
+# from polyglot.text import Text
+
 
 
 #BOTTLENECK: 10 requests per minute, 4000 requests per day
@@ -62,6 +73,7 @@ def parse_response(response):
         'date': [], 
         'vader_SA': [],
         'textblob_SA' : [],
+       # 'textrazor_SA' : [], # Hugging Face Transformers
         'section': [],
         'abstract': [],
         'keywords': [],
@@ -109,12 +121,20 @@ def parse_response(response):
             blob = TextBlob(text)
             data['textblob_SA'].append(blob.sentiment.polarity)
 
-            # Load the pre-trained tokenizer and model for sentiment analysis
-            tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-            model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
+            # # Load the pre-trained tokenizer and model for sentiment analysis
+            # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+            # model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
 
-            
+            # text_obj = Text(text, hint_language_code = 'en')
+            # data['polyglot_SA'].append(text_obj.polarity)
 
+            # sentiment_classifier = pipeline("sentiment-analysis")
+            # result = sentiment_classifier(text)[0]
+            # data['HFT_SA'].append(result['score'])
+
+            # client = textrazor.TextRazor("27258e3285b1f8b0cc975add3f8ff92a5d2f266f3bb96cdba92e7d62")
+            # response = client.analyze(text)
+            # data['textrazor_SA'].append(response.sentiment_score)  
 
     return pd.DataFrame(data) 
 
