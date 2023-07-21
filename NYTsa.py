@@ -22,7 +22,7 @@ from textblob import TextBlob
 
 # import torch
 # from transformers import BertTokenizer, BertForSequenceClassification
-
+ 
 # from flair.models import TextClassifier
 # from flair.data import Sentence
 
@@ -50,8 +50,8 @@ from textblob import TextBlob
 # Should I run SA on full text or just headline/abstract? (full text means much more data but also more accurate)
 
 
-end = datetime.date(2021, 12, 31) # Dec 31 2020
-start = end - relativedelta(months = 1) # Jan 2016
+end = datetime.date(2021, 12, 31) # Dec 31 2021
+start = end - relativedelta(years = 5) # Jan 2017
 
 def send_request(date):
     base_url = 'https://api.nytimes.com/svc/archive/v1/'
