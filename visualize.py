@@ -1,30 +1,77 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Read the average_scores_all_periods.csv file
-df = pd.read_csv('average_scores_all_periods.csv')
+def visualize_daily():
+    # Read the daily_average_SA.csv file
+    daily_average_file_path = "/Users/samfinard/desktop/NYT/daily_average_SA.csv"
+    daily_average_data = pd.read_csv(daily_average_file_path)
 
-# Convert the date (week) column to datetime type
-df['date (week)'] = pd.to_datetime(df['date (week)'])
+    # Convert the 'date' column to datetime type for plotting
+    daily_average_data['date'] = pd.to_datetime(daily_average_data['date'])
 
-# Set the date (week) column as the index
-df.set_index('date (week)', inplace=True)
+    # Create a figure and axis objects
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-# Resample the data to weekly intervals (Tuesday to Tuesday) and calculate the mean
-# df_weekly = df.resample('W-TUE', closed='left', label='left').mean()
+    # Plot Vader scores in red
+    ax.plot(daily_average_data['date'], daily_average_data['vader_SA_daily_average'], color='red', label='Vader')
 
-# Plot the weekly average scores
-plt.figure(figsize=(10, 6))
-plt.plot(df.index, df['average_score'], marker='o', linestyle='-', color='blue', label='Vader')
-plt.plot(df.index, df['average_score.1'], marker='o', linestyle='-', color='red', label='TextBlob')
-plt.xlabel('Date (Week)')
-plt.ylabel('Average Score')
-plt.title('Weekly Average Scores - Vader vs TextBlob')
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
+    # Plot TextBlob scores in blue
+    ax.plot(daily_average_data['date'], daily_average_data['textblob_SA_daily_average'], color='blue', label='TextBlob')
 
-# Save the plot as an image or display it directly
-plt.savefig('weekly_average_scores_vader_vs_textblob.png')
-plt.show()
+    # Set plot title and labels
+    ax.set_title('Daily Sentiment Analysis Averages')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Sentiment Score')
+    ax.legend()
+
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45)
+
+    # Display the plot
+    plt.tight_layout()
+    plt.show()
+
+def visualize_weekly():
+    # Read the daily_average_SA.csv file
+    daily_average_file_path = "/Users/samfinard/desktop/NYT/daily_average_SA.csv"
+    daily_average_data = pd.read_csv(daily_average_file_path)
+
+    # Convert the 'date' column to datetime type
+    daily_average_data['date'] = pd.to_datetime(daily_average_data['date'])
+
+    # Set the 'date' column as the index for easier resampling
+    daily_average_data.set_index('date', inplace=True)
+
+    # Resample the data into weekly averages starting on Tuesday
+    weekly_data = daily_average_data.resample('W-TUE').mean()
+
+    # Create a figure and axis objects
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Plot Vader scores in red
+    ax.plot(weekly_data.index, weekly_data['vader_SA_daily_average'], color='red', label='Vader')
+
+    # Plot TextBlob scores in blue
+    ax.plot(weekly_data.index, weekly_data['textblob_SA_daily_average'], color='blue', label='TextBlob')
+
+    # Set plot title and labels
+    ax.set_title('Weekly Sentiment Analysis Averages (Tuesday to Tuesday)')
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Sentiment Score')
+    ax.legend()
+
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45)
+
+    # Display the plot
+    plt.tight_layout()
+    plt.show()
+
+
+
+def main():
+    # visualize_daily()
+    visualize_weekly()
+
+if __name__ == "__main__":
+    main()
