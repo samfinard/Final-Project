@@ -76,9 +76,6 @@ def combineWithDJIA(root_file_path):
 
     print("Files combined successfully!")
 
-
-
-
 def main(): 
     root_file_path = "/Users/samfinard/desktop/NYT"
 
@@ -89,7 +86,7 @@ def main():
    
     DJIA_file_path = f"{root_file_path}/SA_DJIA_combined.csv"
     DJIA_df = pd.read_csv(DJIA_file_path)
-    new_column_names = {'close': 'DJIA_close'}
+    new_column_names = {'textblob_SA_daily': 'NYT_textblob_daily'}
     DJIA_df.rename(columns=new_column_names, inplace=True)
     DJIA_df.to_csv(DJIA_file_path, index=False)
     print(DJIA_df.columns.tolist())
