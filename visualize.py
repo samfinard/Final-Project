@@ -67,8 +67,6 @@ def visualize_weekly():
     plt.tight_layout()
     plt.show()
 
-
-
 def main():
     # visualize_daily()
     visualize_weekly()
