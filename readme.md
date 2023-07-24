@@ -17,10 +17,10 @@ quick way to check is look at 0 values for the isEnglish column - however this i
 **incorrect lyrics should be flagged 0 in the correct_lyrics column - not necessary to copy paste lyrics yourself**
 
 Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
-update this file and uniqueSongs_lyrics_processed.csv as you go
 
-
-Takes roughly 3 min to do 100 songs
+  update this file and uniqueSongs_lyrics_processed.csv as you go
+  
+  Takes roughly 3 min to do 100 songs
 
 - 1-200 ✅
 - 201-400
@@ -39,7 +39,6 @@ Takes roughly 3 min to do 100 songs
 - 2800-2914
 
 
-
-
 2. continue processing lyrics
-remove "Embed" and any numbers touching "Embed" from the end of all lyrics
+
+  remove "Embed" and any numbers touching "Embed" from the end of all lyrics
