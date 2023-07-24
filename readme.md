@@ -43,7 +43,7 @@ Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
 
   - remove "Embed" and any numbers touching "Embed" from the end of all lyrics]
   - fill in missing lyrics
-3. Finally, ready for Sentiment Analysis
+3. Finally, ready for Sentiment Analysis (need to find more tools, especially for Emotion Classification)
   - Vader
   - TextBlob
   - Polyglot (for non english)
