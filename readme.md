@@ -14,8 +14,7 @@ quick way to check is look at 0 values for the isEnglish column - however this i
   
   songs with no lyrics already have 0 in the correct_lyrics column - can ignore
 
-**incorrect lyrics should be flagged 0 in the correct_lyrics column - not necessary to copy paste lyrics yourself
-**
+**incorrect lyrics should be flagged 0 in the correct_lyrics column - not necessary to copy paste lyrics yourself**
 
 Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
 
