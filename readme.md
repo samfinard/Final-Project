@@ -41,4 +41,10 @@ Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
 
 2. continue processing lyrics
 
-  remove "Embed" and any numbers touching "Embed" from the end of all lyrics
+  - remove "Embed" and any numbers touching "Embed" from the end of all lyrics]
+  - fill in missing lyrics
+3. Finally, ready for Sentiment Analysis
+  - Vader
+  - TextBlob
+  - Polyglot (for non english)
+  
