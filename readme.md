@@ -20,9 +20,9 @@ Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
 
 Takes roughly 3 min to do 100 songs
 
-1-200 ✅
-201-400
-401-600
+- 1-200 ✅
+- 201-400
+- 401-600
 601-800
 801-1000
 1001-1200
