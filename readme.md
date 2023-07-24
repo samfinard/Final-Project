@@ -10,8 +10,9 @@ common patterns to watch out for
   - English song/artist with Russian lyrics (ex. line 189)
   - Instead of lyrics, a list of other songs (ex. 193)
 
-quick way to check is look at 0 values for the isEnglish column - however this isn't enough
-songs with no lyrics already have 0 in the correct_lyrics column - can ignore
+quick way to check is look at 0 values for the isEnglish column - however this isn't enough.
+  
+  songs with no lyrics already have 0 in the correct_lyrics column - can ignore
 
 **incorrect lyrics should be flagged 0 in the correct_lyrics column - not necessary to copy paste lyrics yourself
 **
