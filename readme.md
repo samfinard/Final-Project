@@ -23,8 +23,8 @@ If a song is mostly correct but has some strangeness ("Live concert tickets"), m
 
 Progress  
 **Sam**
-- 1-200
-- 201-400
+- 1-200 ✅
+- 201-400 ✅
 - 401-600
 - 601-800
 - 801-1000  
