@@ -23,16 +23,19 @@ Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
   - Takes roughly 3 min to do 100 songs
   
 Progress
-- 1-200 ✅
+**Sam**
+- 1-200
 - 201-400
 - 401-600
 - 601-800
 - 801-1000
+**Jay**
 - 1001-1200
 - 1201-1400
 - 1401-1600
 - 1601-1800
 - 1801-2000
+**Sam**
 - 2001-2200
 - 2201-2400
 - 2401-2600
