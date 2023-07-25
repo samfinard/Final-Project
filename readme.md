@@ -18,8 +18,10 @@ common patterns to watch out for
 Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
   - update this file as you go
   - Takes roughly 3 min to do 100 songs
-  
-Progress
+
+If a song is mostly correct but has some strangeness ("Live concert tickets"), mark song as "correct" but also note down pattern so we can filter later
+
+Progress  
 **Sam**
 - 1-200
 - 201-400
@@ -41,9 +43,8 @@ Progress
 
 
 2. continue processing lyrics
-
-  - remove "Embed" and any numbers touching "Embed" from the end of all lyrics]
   - fill in missing lyrics
+  - 
 3. Finally, ready for Sentiment Analysis (need to find more tools, especially for Emotion Classification)
   - Vader
   - TextBlob
