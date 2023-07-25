@@ -44,7 +44,7 @@ Progress
 
 2. continue processing lyrics
   - fill in missing lyrics
-  - 
+
 3. Finally, ready for Sentiment Analysis (need to find more tools, especially for Emotion Classification)
   - Vader
   - TextBlob
