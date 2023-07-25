@@ -2,7 +2,7 @@ Beginning of 2017 - End of 2021
 
 Check Lyrics of uniqueSongs_lyrics_processed.csv
 
-1. 2914 songs total - lyrics should be scanned over and briefly checked
+1. 2914 songs total - lyrics should be scanned over and checked
 
 To check if a song is valid
   - lyrics are in the correct language
@@ -12,14 +12,11 @@ common patterns to watch out for
   - English song/artist with Russian lyrics (ex. line 189)
   - Instead of lyrics, a list of other songs (ex. 193)
 
-quick way to check is look at 0 values for the isEnglish column - however this isn't enough.
-  
-  songs with no lyrics already have 0 in the correct_lyrics column - can ignore
 
 **incorrect lyrics should be flagged 0 in the correct_lyrics column - not necessary to copy paste lyrics yourself**
 
 Tip : open in google sheets, make the zoom %50, and navigate using arrow keys
-  - update this file and uniqueSongs_lyrics_processed.csv as you go
+  - update this file as you go
   - Takes roughly 3 min to do 100 songs
   
 Progress
