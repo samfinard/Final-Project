@@ -1,3 +1,5 @@
+Beginning of 2017 - End of 2021
+
 Check Lyrics of uniqueSongs_lyrics_processed.csv
 
 1. 2914 songs total - lyrics should be scanned over and briefly checked
