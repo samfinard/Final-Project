@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from tqdm import tqdm
 
-def classify_emotion(inputfilepath, outputfilepath, threshold):
+def classify_emotion(inputfilepath, outputfilepath, threshold, batch_size=100):
     tokenizer = AutoTokenizer.from_pretrained("SamLowe/roberta-base-go_emotions")
     model = AutoModelForSequenceClassification.from_pretrained("SamLowe/roberta-base-go_emotions")
 
@@ -23,6 +23,11 @@ def classify_emotion(inputfilepath, outputfilepath, threshold):
         labels_and_scores = {model.config.id2label[index]: score.item() for index, score in enumerate(normalized_logits[0])}
         filtered_labels = {label: score for label, score in labels_and_scores.items() if score > threshold}
         emotions_list.append(str(filtered_labels))
+
+        # Save progress to checkpoint file every batch_size records
+        if (i + 1) % batch_size == 0:
+            with open("checkpoint.txt", "w") as checkpoint_file:
+                checkpoint_file.write(f"Processed {i + 1} records\n")
 
     # Add the emotions list as a new column
     df['emotion'] = emotions_list
