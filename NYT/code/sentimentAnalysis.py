@@ -20,6 +20,8 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
 
+from flair.models import TextClassifier
+from flair.data import Sentence
 # from polyglot.text import Text
 
 
@@ -91,22 +93,54 @@ def addBertCheckpoint(inputFilePath, outputFile="lyrics_bert.csv", checkpointFil
         with open(checkpointFile, 'w') as f:
             f.write(str(endRow))
 
-def addPolyglot(headline, abstract):
-    try:
-        text = str(headline) + " " + str(abstract)
-        polyglot_text = Text(text)
-        return polyglot_text.polarity
-    except:
-        return None
+def addFlairCheckpoint(inputFilePath, outputFile="flair_sentiment.csv", checkpointFile="flair_checkpoint.txt", batchSize=100):
+    # Initialize the checkpoint
+    if os.path.exists(checkpointFile):
+        with open(checkpointFile, 'r') as f:
+            checkpoint = f.read()
+            startRow = int(checkpoint or 0)
+    else:
+        startRow = 0
+
+    df = pd.read_csv(inputFilePath)
+
+    # If output file exists, read it and get the 'flair' column. Otherwise, initialize 'flair' column with None.
+    if os.path.exists(outputFile):
+        df_out = pd.read_csv(outputFile)
+        df['flair'] = df_out['flair']
+    else:
+        df['flair'] = [None]*len(df)
+
+    # Load the pre-trained sentiment analysis model
+    classifier = TextClassifier.load('sentiment')
+
+    # Process the rows in batches, starting from the last checkpoint
+    for i in tqdm(range(startRow, len(df), batchSize)):
+        endRow = min(i + batchSize, len(df))
+        for j in range(i, endRow):
+            if pd.isna(df.loc[j, 'flair']):
+                text = str(df.loc[j, 'headline']) + ' ' + str(df.loc[j, 'abstract'])
+                sentence = Sentence(text)
+                classifier.predict(sentence)
+                sentiment_label = sentence.labels[0].value
+                sentiment_score = sentence.labels[0].score
+                df.loc[j, 'flair'] = sentiment_score if sentiment_label == 'POSITIVE' else -sentiment_score
+        df.to_csv(outputFile, index=False)
+
+        # Update the checkpoint
+        with open(checkpointFile, 'w') as f:
+            f.write(str(endRow))
 
 
 
 
 def main():
-    tqdm.pandas()
-    df = pd.read_csv("correct.csv")
-    addBertCheckpoint("correct.csv")
+    # tqdm.pandas()
+    # df = pd.read_csv("correct.csv")
+    # addBertCheckpoint("correct.csv")
 
+    addFlairCheckpoint("../data/NYT_articles_text.csv")
+    
 
     # df['polyglot'] = df.progress_apply(lambda row: addPolyglot(row['headline'], row['abstract']), axis=1)
     # addVader("NYTarticles_all.csv")
