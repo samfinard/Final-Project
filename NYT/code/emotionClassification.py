@@ -4,7 +4,7 @@ import torch
 from tqdm import tqdm
 import os
 
-def classify_emotion(inputfilepath, outputfilepath, threshold, batch_size=500, checkpoint_file="emotion_checkpoint.txt"):
+def classify_emotion(inputfilepath, outputfilepath, threshold, batch_size=20, checkpoint_file="emotion_checkpoint.txt"):
     tokenizer = AutoTokenizer.from_pretrained("SamLowe/roberta-base-go_emotions")
     model = AutoModelForSequenceClassification.from_pretrained("SamLowe/roberta-base-go_emotions")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
