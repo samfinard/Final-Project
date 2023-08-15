@@ -2,38 +2,45 @@ import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from tqdm import tqdm
+import os
 
-def classify_emotion(inputfilepath, outputfilepath, threshold, batch_size=100):
+def classify_emotion(inputfilepath, outputfilepath, threshold, batch_size=100, checkpoint_file="emotion_checkpoint.txt"):
     tokenizer = AutoTokenizer.from_pretrained("SamLowe/roberta-base-go_emotions")
     model = AutoModelForSequenceClassification.from_pretrained("SamLowe/roberta-base-go_emotions")
-
-    # Read the CSV file from the input path
     df = pd.read_csv(inputfilepath)
+    emotions_dict = {f"emotion_{label}": [None] * len(df) for label in model.config.id2label.values()}
 
-    # Initialize an empty list to store emotions
-    emotions_list = []
+    # Initialize the checkpoint
+    if os.path.exists(checkpoint_file):
+        with open(checkpoint_file, 'r') as f:
+            checkpoint = f.read()
+            start_row = int(checkpoint or 0)
+    else:
+        start_row = 0
 
-    # Loop through the DataFrame with tqdm progress bar
-    for i, row in tqdm(df.iterrows(), total=df.shape[0], desc="Classifying emotions"):
-        text = row['abstract'] + ' ' + row['headline']
-        inputs = tokenizer(text, return_tensors="pt", padding=True)
-        with torch.no_grad():
-            outputs = model(**inputs)
-        normalized_logits = torch.sigmoid(outputs.logits)
-        labels_and_scores = {model.config.id2label[index]: score.item() for index, score in enumerate(normalized_logits[0])}
-        filtered_labels = {label: score for label, score in labels_and_scores.items() if score > threshold}
-        emotions_list.append(str(filtered_labels))
+    # Process the rows in batches, starting from the last checkpoint
+    for i in tqdm(range(start_row, len(df), batch_size), desc="Classifying emotions"):
+        end_row = min(i + batch_size, len(df))
+        for j in range(i, end_row):
+            text = df.loc[j, 'abstract'] + ' ' + df.loc[j, 'headline']
+            inputs = tokenizer(text, return_tensors="pt", padding=True)
+            with torch.no_grad():
+                outputs = model(**inputs)
+            normalized_logits = torch.sigmoid(outputs.logits)
+            labels_and_scores = {model.config.id2label[index]: score.item() for index, score in enumerate(normalized_logits[0])}
+            for label, score in labels_and_scores.items():
+                emotions_dict[f"emotion_{label}"][j] = score # if score > threshold else None
 
-        # Save progress to checkpoint file every batch_size records
-        if (i + 1) % batch_size == 0:
-            with open("checkpoint.txt", "w") as checkpoint_file:
-                checkpoint_file.write(f"Processed {i + 1} records\n")
+        # Update the DataFrame and save to output file
+        for col_name, col_values in emotions_dict.items():
+            df[col_name] = col_values
+        df.to_csv(outputfilepath, index=False)
 
-    # Add the emotions list as a new column
-    df['emotion'] = emotions_list
+        # Update the checkpoint
+        with open(checkpoint_file, 'w') as f:
+            f.write(str(end_row))
 
-    # Write the result to the output path
-    df.to_csv(outputfilepath, index=False)
+
 
 def main():
     inputfilepath = "../data/NYT_articles_text.csv"
