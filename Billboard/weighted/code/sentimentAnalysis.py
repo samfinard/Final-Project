@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from tqdm.notebook import tqdm
 from tqdm import tqdm
@@ -13,6 +14,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import tensorflow as tf
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from scipy.special import softmax
 from transformers import pipeline
 
 from flair.models import TextClassifier
@@ -30,8 +32,7 @@ def addTextBlob(inputFilePath):
     df['textblob'] = df.progress_apply(lambda row: TextBlob(str(row['lyrics'])).sentiment.polarity, axis=1)
     df.to_csv("withTextBlob.csv", index=False)
 
-def addBertCheckpoint(inputFilePath, outputFile="withBert.csv", checkpointFile="bert_checkpoint.txt", batchSize=100):
-    # Initialize the checkpoint
+def addBertCheckpoint(inputFilePath, outputFile="withBert.csv", checkpointFile="bert_checkpoint.txt", batchSize=20, window_size=512, stride=512):
     if os.path.exists(checkpointFile):
         with open(checkpointFile, 'r') as f:
             checkpoint = f.read()
@@ -41,31 +42,37 @@ def addBertCheckpoint(inputFilePath, outputFile="withBert.csv", checkpointFile="
 
     df = pd.read_csv(inputFilePath)
 
-    # If output file exists, read it and get the 'bert' column. Otherwise, initialize 'bert' column with None.
     if os.path.exists(outputFile):
         df_out = pd.read_csv(outputFile)
         df['bert'] = df_out['bert']
     else:
         df['bert'] = [None]*len(df)
 
-    nlp = pipeline('sentiment-analysis', model='distilbert-base-uncased', max_length=512, truncation=True)
+    tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+    model = AutoModelForSequenceClassification.from_pretrained('distilbert-base-uncased', return_dict=True)
 
-    # Process the rows in batches, starting from the last checkpoint
+    # Move model to GPU if available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+
     for i in tqdm(range(startRow, len(df), batchSize)):
         endRow = min(i + batchSize, len(df))
         for j in range(i, endRow):
             if pd.isna(df.loc[j, 'bert']):
-                result = nlp(str(df.loc[j, 'lyrics']))[0]
-                df.loc[j, 'bert'] = -result['score'] if result['label'] == 'NEGATIVE' else result['score']
+                lyrics = str(df.loc[j, 'lyrics'])
+                segments = [lyrics[k:k+window_size] for k in range(0, len(lyrics), stride)]
+                inputs = tokenizer(segments, return_tensors="pt", truncation=False, padding='max_length', max_length=window_size)
+                inputs = {key: val.to(device) for key, val in inputs.items()} # Move inputs to GPU if available
+                outputs = model(**inputs)
+                scores = torch.softmax(outputs.logits, dim=1)
+                score = torch.mean(scores, dim=0)[1].item()
+                df.loc[j, 'bert'] = score
         df.to_csv(outputFile, index=False)
 
-
-        # Update the checkpoint
         with open(checkpointFile, 'w') as f:
             f.write(str(endRow))
 
-def addFlairCheckpoint(inputFilePath, outputFile="withFlair.csv", checkpointFile="flair_checkpoint.txt", batchSize=20):
-    # Initialize the checkpoint
+def addBertCheckpoint(inputFilePath, outputFile="withBert.csv", checkpointFile="bert_checkpoint.txt", batchSize=20, window_size=510, stride=510):
     if os.path.exists(checkpointFile):
         with open(checkpointFile, 'r') as f:
             checkpoint = f.read()
@@ -75,33 +82,35 @@ def addFlairCheckpoint(inputFilePath, outputFile="withFlair.csv", checkpointFile
 
     df = pd.read_csv(inputFilePath)
 
-    # If output file exists, read it and get the 'flair' column. Otherwise, initialize 'flair' column with None.
     if os.path.exists(outputFile):
         df_out = pd.read_csv(outputFile)
-        df['flair'] = df_out['flair']
+        df['bert'] = df_out['bert']
     else:
-        df['flair'] = [None]*len(df)
+        df['bert'] = [None]*len(df)
 
-    # Load the pre-trained sentiment analysis model
-    classifier = TextClassifier.load('sentiment')
+    tokenizer = AutoTokenizer.from_pretrained('distilbert-base-uncased')
+    model = AutoModelForSequenceClassification.from_pretrained('distilbert-base-uncased', return_dict=True)
 
-    # Process the rows in batches, starting from the last checkpoint
+    # Move model to GPU if available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+
     for i in tqdm(range(startRow, len(df), batchSize)):
         endRow = min(i + batchSize, len(df))
         for j in range(i, endRow):
-            if pd.isna(df.loc[j, 'flair']):
-                text = str(df.loc[j, 'lyrics'])
-                sentence = Sentence(text)
-                classifier.predict(sentence)
-                sentiment_label = sentence.labels[0].value
-                sentiment_score = sentence.labels[0].score
-                df.loc[j, 'flair'] = sentiment_score if sentiment_label == 'POSITIVE' else -sentiment_score
+            if pd.isna(df.loc[j, 'bert']):
+                lyrics = str(df.loc[j, 'lyrics'])
+                segments = [lyrics[k:k+window_size] for k in range(0, len(lyrics), stride)]
+                inputs = tokenizer(segments, return_tensors="pt", padding=True, truncation=True, max_length=512)
+                inputs = {key: val.to(device) for key, val in inputs.items()} # Move inputs to GPU if available
+                outputs = model(**inputs)
+                scores = torch.softmax(outputs.logits, dim=1)
+                score = torch.mean(scores, dim=0)[1].item()
+                df.loc[j, 'bert'] = score
         df.to_csv(outputFile, index=False)
 
-        # Update the checkpoint
         with open(checkpointFile, 'w') as f:
             f.write(str(endRow))
-
 
 def main():
     # addVader("data/popularityLyrics.csv")
