@@ -1,4 +1,4 @@
-ID,track_name,artist_name,track_length,track_popularity,valence,danceability,energy,loudness,tempo
+ID,song,artist,track_length,track_popularity,valence,danceability,energy,loudness,tempo
 46IZ0fSY2mpAiktS3KOqds,Easy On Me,Adele,224694,83,0.13,0.604,0.366,-7.519,141.981
 5HCyWlXZPP0y6Gqq8TgA20,STAY (with Justin Bieber),The Kid LAROI,141805,86,0.478,0.591,0.764,-5.484,169.928
 27NovPIUIRrOZoCHxABJwK,INDUSTRY BABY (feat. Jack Harlow),Lil Nas X,212000,82,0.894,0.736,0.704,-7.409,149.995

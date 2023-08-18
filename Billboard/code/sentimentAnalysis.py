@@ -5,8 +5,11 @@ import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
 from tqdm import tqdm
 tqdm.pandas()
-import nltk
+import time
 # nltk.download('vader_lexicon')
+
+import os
+from ast import literal_eval
 
 from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
@@ -17,6 +20,9 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import pipeline
 
+from flair.models import TextClassifier
+from flair.data import Sentence
+# from polyglot.text import Text
 
 
 def classify_emotion(text):
@@ -32,22 +38,6 @@ def classify_emotion(text):
     
     return categories[torch.argmax(probs)]
 
-def bert(text):
-    nlp = pipeline('sentiment-analysis')
-    return nlp(text)[0]
-
-
-# Function for NLTK
-def get_nltk(text):
-    sia = SentimentIntensityAnalyzer()
-    polarity = sia.polarity_scores(text)
-    return polarity
-
-# Function for TextBlob
-def textblob(text):
-    testimonial = TextBlob(text)
-    polarity = testimonial.sentiment.polarity
-    return polarity
 
 
 def addVader(inputFilePath):
@@ -62,33 +52,96 @@ def addBert(inputFilePath):
     df['bert'] = df.progress_apply(lambda row: nlp(str(row['headline']) + ' ' + str(row['abstract']))[0]['score'], axis=1)
     df['bert'] = df['bert'].apply(lambda x: -x['score'] if x['label'] == 'NEGATIVE' else x['score'])
 
-    df.to_csv("NYTarticles_all_vader_bert.csv", index=False)
+    df.to_csv("NYTarticles_all_vader_textblob_bert.csv", index=False)
 
 def addTextBlob(inputFilePath):
     df = pd.read_csv(inputFilePath)
     df['textblob'] = df.progress_apply(lambda row: TextBlob(str(row['headline']) + ' ' + str(row['abstract'])).sentiment.polarity, axis=1)
     df.to_csv("NYTarticles_all_vader_textblob.csv", index=False)
 
+def addBertCheckpoint(inputFilePath, outputFile="lyrics_bert.csv", checkpointFile="bert_checkpoint.txt", batchSize=100):
+    # Initialize the checkpoint
+    if os.path.exists(checkpointFile):
+        with open(checkpointFile, 'r') as f:
+            checkpoint = f.read()
+            startRow = int(checkpoint or 0)
+    else:
+        startRow = 0
+
+    df = pd.read_csv(inputFilePath)
+
+    # If output file exists, read it and get the 'bert' column. Otherwise, initialize 'bert' column with None.
+    if os.path.exists(outputFile):
+        df_out = pd.read_csv(outputFile)
+        df['bert'] = df_out['bert']
+    else:
+        df['bert'] = [None]*len(df)
+
+    nlp = pipeline('sentiment-analysis', model='distilbert-base-uncased', max_length=512, truncation=True)
+
+    # Process the rows in batches, starting from the last checkpoint
+    for i in tqdm(range(startRow, len(df), batchSize)):
+        endRow = min(i + batchSize, len(df))
+        for j in range(i, endRow):
+            if pd.isna(df.loc[j, 'bert']):
+                result = nlp(str(df.loc[j, 'lyrics']))[0]
+                df.loc[j, 'bert'] = -result['score'] if result['label'] == 'NEGATIVE' else result['score']
+        df.to_csv(outputFile, index=False)
+
+
+        # Update the checkpoint
+        with open(checkpointFile, 'w') as f:
+            f.write(str(endRow))
+
+def addFlairCheckpoint(inputFilePath, outputFile="flair_sentiment.csv", checkpointFile="flair_checkpoint.txt", batchSize=100):
+    # Initialize the checkpoint
+    if os.path.exists(checkpointFile):
+        with open(checkpointFile, 'r') as f:
+            checkpoint = f.read()
+            startRow = int(checkpoint or 0)
+    else:
+        startRow = 0
+
+    df = pd.read_csv(inputFilePath)
+
+    # If output file exists, read it and get the 'flair' column. Otherwise, initialize 'flair' column with None.
+    if os.path.exists(outputFile):
+        df_out = pd.read_csv(outputFile)
+        df['flair'] = df_out['flair']
+    else:
+        df['flair'] = [None]*len(df)
+
+    # Load the pre-trained sentiment analysis model
+    classifier = TextClassifier.load('sentiment')
+
+    # Process the rows in batches, starting from the last checkpoint
+    for i in tqdm(range(startRow, len(df), batchSize)):
+        endRow = min(i + batchSize, len(df))
+        for j in range(i, endRow):
+            if pd.isna(df.loc[j, 'flair']):
+                text = str(df.loc[j, 'lyrics'])
+                sentence = Sentence(text)
+                classifier.predict(sentence)
+                sentiment_label = sentence.labels[0].value
+                sentiment_score = sentence.labels[0].score
+                df.loc[j, 'flair'] = sentiment_score if sentiment_label == 'POSITIVE' else -sentiment_score
+        df.to_csv(outputFile, index=False)
+
+        # Update the checkpoint
+        with open(checkpointFile, 'w') as f:
+            f.write(str(endRow))
+
+
 
 def main():
-    # filepath = "../data/NYTarticles_all.csv"
-    # addVader(filepath)
-    filepath = "NYTarticles_all_vader_textblob.csv"
-    # addTextBlob(filepath)
-    addBert("NYTarticles_all_vader.csv")
+    addVader("data/2949_tracks_metadata_lyrics.csv")
+    time.sleep(1)
+    addTextBlob("withVader.csv")
+    time.sleep(1)
+    addFlairCheckpoint("withTextBlob.csv")
+    time.sleep(1)
+    addBertCheckpoint("withFlair.csv")
     
-    # addTextBlob("NYTarticles_all_vader.csv")
-    
-    # df = pd.read_csv(filepath)
-    # print(df.columns.tolist())
-    # print(bert("test"))
-    
-    # text = "Testing the sentiment analysis. I am very anxious.."
-    # print("nltk: ", get_nltk(text))
-    # print("textblob: ", textblob(text))
-    # print("vader: ", vader(text))
-    # print("bert: ", bert(text))
-    # print("classify_emotion: ", classify_emotion(text))
 
 if __name__ == "__main__":
     main()
