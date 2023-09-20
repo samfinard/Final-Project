@@ -11,7 +11,7 @@ start = end - relativedelta(years = 5) # Jan 2017
 
 def send_request(date):
     base_url = 'https://api.nytimes.com/svc/archive/v1/'
-    private_key = "ZTDuHtMacPzfve7f7GZ7obg1TTGZ8myp"
+    private_key = ""
     url = base_url + '/' + date[0] + '/' + date[1] + '.json?api-key=' + private_key
     response = requests.get(url).json()
     time.sleep(6) # 10 requests per minute

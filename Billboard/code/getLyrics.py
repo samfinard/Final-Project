@@ -4,7 +4,7 @@ import time
 from tqdm import tqdm
 
 # Initialize the Genius API client
-genius = lyricsgenius.Genius('3JxP5khQzzzhp1XcBmCiBcEnrXHgX7c3xW1uKGlN3fTVGVhhhJ3zSb3XS0UMz8aP')
+genius = lyricsgenius.Genius()
 
 # Load the data
 df = pd.read_csv('russian_songs.csv')
