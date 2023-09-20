@@ -1,5 +1,1 @@
-**Timeframe: Beginning of 2017 - End of 2021**
-
-Need to:
-- Each song has an array of dates it was in the top 100. For each date, get its position out of 100. Should be dictionary - {date: position}
-- Check the p values for existing correlations
+The project was to predict DJIA closing prices using popular song lyrics, New York Times articles, and trending Google searches. Our timespan was 2017-2021 and our region of focus was America. We used a Kaggle dataset to get all Billboard Hot 100 songs and the lyricsgenius python package to obtain lyrics for each of the 3100+ unique songs. The NYT articles were obtained through the NYT public API, and the trending Google searches were obtained from https://trends.google.com/trends/. Using four different sentiment analysis tools, we aggregated sentiment scores by week for each data source and used RapidMiner as a predictive modeling tool. We found a statistically significant correlation between stocks and song lyrics and are working to strengthen this result. I came up with this idea and lead a small team of 2. 
