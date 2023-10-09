@@ -1,0 +1,12 @@
+Source,Target,Pearson_Corr
+WEIGHTED_flair,DJIA close,-0.625614699
+song_flair,DJIA close,-0.61704553
+WEIGHTED_bert,DJIA close,-0.588714375
+song_bert,DJIA close,-0.535967298
+WEIGHTED_tb_song_by_sentence,DJIA close,0.383690676
+textblob_full,DJIA close,0.34159453
+textblob,DJIA close,0.309111225
+whole_song_textblob,DJIA close,0.250752295
+WEIGHTED_tb_whole_song,DJIA close,0.246187343
+song_by_sentence_without_0_textblob,DJIA close,0.2418262
+WEIGHTED_tb_song_by_sentence_without_0,DJIA close,0.237895687
