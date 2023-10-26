@@ -36,7 +36,7 @@ def getLyrics(start, end):
     df.to_csv(f'dateRankLyrics_{start.strftime("%Y-%m-%d")}_{end.strftime("%Y-%m-%d")}.csv', index=False)
 
 def main():
-    start, end = "01/01/2010", "01/01/2018"
+    start, end = "01/01/2018", "10/26/2023"
     getLyrics(start, end)    
     
 if __name__ == "__main__":
