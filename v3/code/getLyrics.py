@@ -3,7 +3,6 @@ import lyricsgenius
 import ast
 from tqdm import tqdm
 
-
 genius = lyricsgenius.Genius("cm-U8F4lL_ZSZEu_wyPykBhTrWBFUwhFKZRwwhF9ZvKPK2BzoBdb2Ad1aQoazFy7g36x7vqltuzwsSeyVZ5vXQ")
 
 def fetch_lyrics(song, artist):
@@ -37,11 +36,8 @@ def getLyrics(start, end):
     df.to_csv(f'dateRankLyrics_{start.strftime("%Y-%m-%d")}_{end.strftime("%Y-%m-%d")}.csv', index=False)
 
 def main():
-    start, end = "01/01/2010", "01/01/2021"
-    getLyrics(start, end)
-
-    # Modify this path to point to your actual CSV file
-    
+    start, end = "01/01/2010", "01/01/2018"
+    getLyrics(start, end)    
     
 if __name__ == "__main__":
     main()
