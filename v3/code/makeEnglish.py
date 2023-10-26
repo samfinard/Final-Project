@@ -6,7 +6,7 @@ tqdm.pandas()
 def isEnglish(text):
     return detect(text) == 'en'
 
-inputFile = "dateRankLyrics_2010-01-01_2018-01-01.csv"
+inputFile = "/Users/samfinard/src/1PA/Final-Project/v3/data/dateRankLyrics_2018-01-01_2023-10-26.csv"
 df = pd.read_csv(inputFile)
 
 parts = inputFile.split('_')

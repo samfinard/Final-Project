@@ -1,0 +1,13 @@
+numMissing: 174
+numOtherLang: 274
+numEng: 5,471
+
+Total: 5,919
+
+% missing: 2.93
+% other lang: 4.62
+
+total % unaccounted for: 7.55
+
+Likely will go to %10-15 after we remove B.S. from lyrics
+
