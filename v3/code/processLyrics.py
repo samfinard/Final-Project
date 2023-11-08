@@ -13,15 +13,16 @@ from tqdm import tqdm
 tqdm.pandas()
 
 def lower_remove_nonChar(df):
-    df['lyrics'] = df['lyrics'].str.lower()
+    df['lyrics'] = df['lyrics'].str()
 
     def keep(char): # only keep lowercase letters, spaces, apostrophes, hyphens
                     # period comma, exclamation mark, semicolon, or colon
         o = ord(char)
-        return (o == 32 or o == 33 
+        return (o == 32 or o == 33 or o == 40 
                 or (44 <= o and o <= 46) 
                 or o == 58 or o == 59 or o == 63 
-                or (96 <= o and o <= 122))
+                or (96 <= o and o <= 122)
+                or (66 <= o and o <= 91))
    
     def remove_fluff(text):
         return ''.join(char if keep(char) else ' ' for char in text)
