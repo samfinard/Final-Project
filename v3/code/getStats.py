@@ -18,13 +18,13 @@ def dropMissingLyrics(filename):
     cleaned_df.to_csv("droppedLyrics.csv")
 
 def main():
-    input = "/Users/samfinard/src/1PA/Final-Project/v3/data/lyricsToClean_2010-01-01_2021-11-06.csv"
+    # input = "/Users/samfinard/src/1PA/Final-Project/v3/data/cleaned_lyrics_2010_2021.csv"
     # addDateCount(input)
     
-    # dropMissingLyrics("/Users/samfinard/src/1PA/Final-Project/v3/output.csv")
-    
-    # df = pd.read_csv("/Users/samfinard/src/1PA/Final-Project/v3/output.csv")
-    # print(df['dateCount'].describe())
+    input2 = "/Users/samfinard/src/1PA/Final-Project/v3/output.csv"
+    df = pd.read_csv(input2)
+    print(df.head)
+
 if __name__ == "__main__":
     main()
 

@@ -39,12 +39,11 @@ def lower_remove_nonChar(df):
 
 def main():
     df = pd.read_csv("/Users/samfinard/src/1PA/Final-Project/v3/output.csv", low_memory=False)
-    
-
     df = lower_remove_nonChar(df)
 
-    df.to_csv("output2.csv", index=False)
 
+
+    df.to_csv("output2.csv", index=False)
     # df = pd.read_csv("/Users/samfinard/src/1PA/Final-Project/v3/output.csv", low_memory=False)
     
 if __name__ == "__main__":
