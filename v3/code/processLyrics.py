@@ -13,7 +13,7 @@ from tqdm import tqdm
 tqdm.pandas()
 
 def lower_remove_nonChar(df):
-    df['lyrics'] = df['lyrics'].str()
+    df['lyrics'] = df['lyrics'].str.lower()
 
     def keep(char): # only keep lowercase letters, spaces, apostrophes, hyphens
                     # period comma, exclamation mark, semicolon, or colon
@@ -25,6 +25,8 @@ def lower_remove_nonChar(df):
                 or (66 <= o and o <= 91))
    
     def remove_fluff(text):
+        if pd.isna(text):  # Check if the text is NaN
+            return ""  # Return an empty string for NaN values
         return ''.join(char if keep(char) else ' ' for char in text)
     
     df['lyrics'] = df['lyrics'].progress_apply(remove_fluff)
@@ -36,11 +38,14 @@ def lower_remove_nonChar(df):
     return df
 
 def main():
-    df = pd.read_csv("/Users/samfinard/src/1PA/Final-Project/v3/data/lyricsToClean_2010-01-01_2021-11-06.csv")
+    df = pd.read_csv("/Users/samfinard/src/1PA/Final-Project/v3/output.csv", low_memory=False)
+    
 
     df = lower_remove_nonChar(df)
 
-    df.to_csv("/Users/samfinard/src/1PA/Final-Project/v3/data/slightlyCleaned_2010_2021.csv", index=False)
+    df.to_csv("output2.csv", index=False)
 
+    # df = pd.read_csv("/Users/samfinard/src/1PA/Final-Project/v3/output.csv", low_memory=False)
+    
 if __name__ == "__main__":
     main()
