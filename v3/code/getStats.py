@@ -1,10 +1,16 @@
 import pandas as pd
 import ast
 
+def safe_literal_eval(s):
+    try:
+        return ast.literal_eval(s)
+    except ValueError:
+        return []
+
 def addDateCount(filename):
-    df = pd.read_csv(filename)
-    df['dateRank'] = df['dateRank'].apply(ast.literal_eval)
-    df['dateCount'] = df['dateRank'].apply(lambda x: len(x))
+    df = pd.read_csv(filename, low_memory=False)
+    df['dateRank'] = df['dateRank'].apply(lambda x: safe_literal_eval(x) if pd.notna(x) and isinstance(x, str) else [])
+    df['dateCount'] = df['dateRank'].apply(len)
     df = df.sort_values(by='dateCount', ascending=False)
     df.to_csv("output.csv", index=False)
 
@@ -18,12 +24,10 @@ def dropMissingLyrics(filename):
     cleaned_df.to_csv("droppedLyrics.csv")
 
 def main():
-    # input = "/Users/samfinard/src/1PA/Final-Project/v3/data/cleaned_lyrics_2010_2021.csv"
-    # addDateCount(input)
+    input = "/Users/samfinard/src/1PA/Final-Project/v3/data/cleanedLyrics_withCounter.csv"
     
-    input2 = "/Users/samfinard/src/1PA/Final-Project/v3/output.csv"
-    df = pd.read_csv(input2)
-    print(df.head)
+    df = pd.read_csv(input, low_memory=False)
+    
 
 if __name__ == "__main__":
     main()
